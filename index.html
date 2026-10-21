@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ôn tập Lịch sử và Địa lí 6</title><style>
+:root{--navy:#15324b;--blue:#2563eb;--teal:#0f766e;--paper:#f4f7fb;--ink:#17212b;--muted:#5d6b79;--line:#dce4ed;--good:#dcfce7;--bad:#fee2e2}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+header{background:linear-gradient(120deg,#15324b,#2563eb);color:white;padding:24px 18px}header .wrap,main{max-width:1000px;margin:auto}
+h1{margin:0 0 6px;font-size:clamp(24px,4vw,34px)}h2{color:var(--navy);margin-top:0}p{margin:.45rem 0}
+main{padding:22px 16px 60px}.panel,.question,.result-card{background:white;border:1px solid var(--line);border-radius:16px;padding:20px;margin:0 0 16px;box-shadow:0 5px 18px #1e293b0a}
+button,.btn{display:inline-block;border:0;border-radius:10px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer;text-decoration:none}
+button.primary,.btn.primary{background:var(--blue);color:white}button.secondary,.btn.secondary{background:#e6eef8;color:var(--navy)}button.danger{background:#b91c1c;color:white}
+input,textarea,select{width:100%;padding:11px 12px;border:1px solid #bcc9d7;border-radius:9px;font:inherit;background:white}textarea{min-height:120px;resize:vertical}
+label{display:block;font-weight:650;margin:10px 0 6px}.option{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin:7px 0;font-weight:400}.option input{width:auto;margin-top:5px}
+.small{font-size:.9rem;color:var(--muted)}.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.timer{font-variant-numeric:tabular-nums;font-weight:800;font-size:1.15rem}.hidden{display:none!important}
+.badge{display:inline-block;border-radius:999px;padding:4px 10px;background:#e8f1ff;color:#1d4ed8;font-size:.85rem;font-weight:700}
+table{width:100%;border-collapse:collapse;background:white}th,td{text-align:left;border-bottom:1px solid var(--line);padding:10px;vertical-align:top}th{background:#edf3fa}
+.correct{background:var(--good);padding:10px;border-radius:8px}.incorrect{background:var(--bad);padding:10px;border-radius:8px}.answer{white-space:pre-wrap}.question h3{margin:0 0 10px;color:var(--navy)}.sticky{position:sticky;top:0;z-index:5;background:#ffffffed;border-bottom:1px solid var(--line);backdrop-filter:blur(8px);padding:10px 16px}.progress{height:7px;background:#e2e8f0;border-radius:99px;overflow:hidden}.progress span{display:block;height:100%;background:#0f766e;width:0}
+@media(max-width:620px){.panel,.question{padding:15px}table{font-size:.88rem}th,td{padding:7px}}
+</style></head><body>
+<header><div class="wrap"><h1>Ôn tập giữa kì I · Lịch sử và Địa lí 6</h1><p>Năm học 2026–2027 · Chọn phân môn để bắt đầu luyện tập</p></div></header>
+<main>
+<section class="panel"><h2>Em muốn ôn tập phần nào?</h2><div class="row">
+<a class="btn primary" href="lich_su.html">Ôn tập Phần Lịch sử</a><a class="btn primary" href="dia_li.html">Ôn tập Phần Địa lí</a></div>
+<p class="small">Bài làm và lịch sử được lưu trên trình duyệt hiện tại bằng localStorage; dữ liệu không tự đồng bộ sang máy khác.</p></section>
+<section class="panel"><div class="row"><div><h2>Lịch sử bài làm</h2><p class="small">Các lần nộp bài trên thiết bị/trình duyệt này.</p></div><button id="clearHistory" class="danger">Xóa lịch sử</button></div>
+<div id="historyWrap"></div></section></main>
+<script>
+const KEY='quiz_history';
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function render(){let arr=[];try{arr=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){}
+const wrap=document.getElementById('historyWrap');if(!arr.length){wrap.innerHTML='<p>Chưa có bài làm nào được lưu.</p>';return}
+wrap.innerHTML='<div style="overflow:auto"><table><thead><tr><th>Thời gian nộp</th><th>Tên học sinh</th><th>Phần đã làm</th><th>Điểm</th><th>Thời gian hoàn thành</th></tr></thead><tbody>'+arr.slice().reverse().map(x=>`<tr><td>${esc(x.submittedAt)}</td><td>${esc(x.name)}</td><td>${esc(x.subject)}</td><td><b>${esc(x.score)}/10</b></td><td>${esc(x.duration)}</td></tr>`).join('')+'</tbody></table></div>'}
+document.getElementById('clearHistory').addEventListener('click',()=>{if(confirm('Bạn có chắc muốn xóa toàn bộ lịch sử bài làm trên trình duyệt này?')){localStorage.removeItem(KEY);render()}});render();
+</script></body></html>
