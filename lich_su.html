@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn tập Phần Lịch sử 6</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #0284c7;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --correct: #16a34a;
+            --wrong: #dc2626;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        h1, h2 { color: var(--primary); text-align: center; }
+        .section-header { background-color: #e0f2fe; color: #0369a1; padding: 10px 15px; border-radius: 6px; margin-top: 25px; font-weight: bold; }
+        .start-screen { text-align: center; padding: 40px 20px; }
+        .form-group { margin: 20px 0; }
+        input[type="text"] { width: 80%; max-width: 400px; padding: 12px; font-size: 16px; border: 2px solid #cbd5e1; border-radius: 6px; outline: none; }
+        button { background-color: var(--primary); color: white; border: none; padding: 12px 28px; font-size: 16px; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+        button:hover { background-color: var(--secondary); }
+        .timer-bar { position: sticky; top: 0; background: #fff; padding: 10px; border-bottom: 2px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .question-card { border: 1px solid #e2e8f0; padding: 18px; border-radius: 8px; margin: 15px 0; background: #fff; }
+        .options label { display: block; margin: 8px 0; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; }
+        .options label:hover { background-color: #f1f5f9; }
+        textarea { width: 100%; height: 100px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; resize: vertical; }
+        .true-false-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .true-false-table th, .true-false-table td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; }
+        .true-false-table th { background-color: #f8fafc; }
+        .score-board { background: #f0fdf4; border: 2px solid #bbf7d0; padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: center; }
+        .badge-correct { color: var(--correct); font-weight: bold; }
+        .badge-wrong { color: var(--wrong); font-weight: bold; }
+        .hidden { display: none; }
+        .nav-link { display: inline-block; margin-bottom: 15px; color: var(--secondary); text-decoration: none; font-weight: bold; }
+        .nav-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="nav-link">&larr; Quay lại Trang chủ</a>
+    
+    <div id="startScreen" class="start-screen">
+        <h1>ÔN TẬP PHẦN LỊCH SỬ 6</h1>
+        <p>Kiểm tra Giữa kì I - Năm học 2026 - 2027[cite: 1]</p>
+        <div class="form-group">
+            <input type="text" id="studentName" placeholder="Nhập họ và tên học sinh..." required>
+        </div>
+        <button onclick="startQuiz()">BẮT ĐẦU LÀM BÀI</button>
+    </div>
+
+    <div id="quizScreen" class="hidden">
+        <div class="timer-bar">
+            <div>Học sinh: <strong id="displayName"></strong></div>
+            <div>Thời gian: <strong id="timer">00:00</strong></div>
+        </div>
+        <form id="quizForm">
+            <div id="questionsContainer"></div>
+            <div style="text-align: center; margin-top: 30px;">
+                <button type="button" onclick="submitQuiz()">NỘP BÀI</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="resultScreen" class="hidden">
+        <h2>KẾT QUẢ PHẦN LỊCH SỬ</h2>
+        <div class="score-board">
+            <h3 id="resultStudentName"></h3>
+            <p id="resultTime"></p>
+            <div style="font-size: 18px; margin: 15px 0;">
+                Tổng điểm đánh giá: <strong id="totalScore">0</strong> / <strong id="maxScore">0</strong>
+            </div>
+        </div>
+        <div id="reviewContainer"></div>
+        <div style="text-align: center; margin-top: 30px; display: flex; justify-content: center; gap: 15px;">
+            <button onclick="location.reload()">LÀM LẠI BÀI</button>
+            <button onclick="window.location.href='index.html'" style="background-color: #64748b;">VỀ TRANG CHỦ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const rawData = {
+    ls_mcq: [
+        { q: "Môn Lịch sử là môn học tìm hiểu về", a: ["quá trình hình thành và phát triển của xã hội loài người."], w: ["các hành tinh trong hệ Mặt Trời.", "cấu tạo và hoạt động của cơ thể người.", "các hiện tượng tự nhiên trên Trái Đất."] },
+        { q: "Lịch sử là", a: ["những gì đã xảy ra trong quá khứ."], w: ["những sự việc sẽ xảy ra trong tương lai.", "những hoạt động đang diễn ra ở hiện tại.", "những câu chuyện do con người tưởng tượng."] },
+        { q: "Người đứng đầu nhà nước ở Ai Cập cổ đại được gọi là gì?", a: ["Pha-ra-ông."], w: ["En-xi.", "Hoàng đế.", "Vua chư hầu."] },
+        { q: "Ai Cập cổ đại nằm ở khu vực nào trên bản đồ thế giới?", a: ["Đông Bắc của châu Phi."], w: ["Đông Nam của châu Phi.", "Tây Nam của châu Á.", "Tây Bắc của châu Âu."] },
+        { q: "Người Lưỡng Hà cổ đại nổi tiếng với thành tựu toán học tính toán theo hệ đếm nào?", a: ["Hệ đếm 60."], w: ["Hệ đếm 24.", "Hệ đếm 10.", "Hệ đếm 100."] },
+        { q: "Đẳng cấp nào trong xã hội Ấn Độ cổ đại gồm các vương công và quý tộc?", a: ["Ksa-tri-a."], w: ["Bra-man.", "Vai-si-a.", "Su-đra."] },
+        { q: "Sự thay đổi của con người và xã hội loài người theo thời gian được gọi là", a: ["lịch sử."], w: ["địa lí.", "văn hóa.", "khảo cổ học."] },
+        { q: "Nội dung nào sau đây thuộc phạm vi tìm hiểu của môn Lịch sử?", a: ["Quá trình hình thành và phát triển của xã hội loài người."], w: ["Quá trình hình thành các dãy núi.", "Sự thay đổi thời tiết giữa các mùa.", "Đặc điểm sinh trưởng của các loài cây."] },
+        { q: "Tên gọi \"Lưỡng Hà\" xuất phát từ đặc điểm địa lý nào dưới đây?", a: ["Vùng đất nằm giữa hai con sông lớn là Ti-gơ-rơ và Ơ-phơ-rát."], w: ["Vùng đất nằm ở hạ lưu của con sông Nin huyền thoại.", "Vùng đất được bao bọc bởi hai dãy núi lớn và sa mạc.", "Vùng đất nằm giữa hai biển lớn là Địa Trung Hải và Biển Đỏ."] },
+        { q: "Vào khoảng năm 3200 TCN, vị vua nào đã thống nhất các nôm (công xã) để thành lập nhà nước Ai Cập?", a: ["Mê-nét."], w: ["Ha-mu-ra-bi.", "Ác-si-mét.", "Xít-đác-ta."] },
+        { q: "Công trình kiến trúc nào dưới đây là thành tựu tiêu biểu của người Ai Cập cổ đại?", a: ["Các kim tự tháp và tượng Nhân sư."], w: ["Vườn treo Ba-bi-lon.", "Đấu trường Cô-li-dê.", "Đền Pác-tê-nông."] },
+        { q: "Hệ thống phân chia xã hội Ấn Độ cổ đại dựa trên sự phân biệt về chủng tộc và màu da được gọi là gì?", a: ["Chế độ đẳng cấp Vác-na."], w: ["Chế độ phong kiến.", "Chế độ nô lệ cổ đại.", "Chế độ thị tộc mẫu hệ."] },
+        { q: "Để tìm hiểu về quá trình hình thành và phát triển của xã hội loài người từ khi xuất hiện đến nay, học sinh cần học tập môn học nào?", a: ["Môn Lịch sử."], w: ["Môn Địa lí.", "Môn Toán học", "Môn Khoa học tự nhiên."] },
+        { q: "Lịch sử gắn liền với sự thay đổi của sự vật, con người và xã hội loài người theo", a: ["thời gian."], w: ["không gian.", "điều kiện thời tiết.", "mùa trong năm."] },
+        { q: "Ai Cập được ví là \"tặng phẩm\" của dòng sông nào?", a: ["Sông Nin."], w: ["Sông Hằng.", "Sông Hoàng Hà.", "Sông Ti-gơ-rơ."] },
+        { q: "Khoảng thiên niên kỉ IV TCN, cư dân nào đến định cư ở vùng hạ lưu Lưỡng Hà và đầu tiên xây dựng các nhà nước thành bang?", a: ["Người Xu-me."], w: ["Người Ai Cập.", "Người Hy Lạp.", "Người La Mã."] },
+        { q: "Người Ai Cập cổ đại đã sử dụng nguyên liệu nào từ thiên nhiên để làm ra giấy viết?", a: ["Thân cây pa-pi-rút."], w: ["Vỏ cây gai.", "Các tấm đất sét ướt.", "Mai rùa và xương thú."] },
+        { q: "Theo chế độ đẳng cấp Vác-na ở Ấn Độ cổ đại, đứng ở vị trí cao nhất (tăng lữ) là đẳng cấp nào?", a: ["Bra-man."], w: ["Ksa-tri-a.", "Vai-si-a.", "Su-đra."] }
+    ],
+    ls_tf: [
+        {
+            title: "Câu 19. Đọc đoạn tư liệu về tư liệu lịch sử và sự tiến hóa loài người[cite: 1]:",
+            items: [
+                { text: "a. Ý nghĩa cơ bản của các nguồn tư liệu hiện vật và tư liệu gốc là giúp các nhà sử học khôi phục lại các sự kiện quá khứ một cách chính xác và khoa học[cite: 1].", correct: "Đ" },
+                { text: "b. Các nhà khảo cổ học đã tìm thấy răng hoá thạch của Người tối cổ tại các hang Thẩm Khuyên và Thẩm Hai ở tỉnh Lạng Sơn[cite: 1].", correct: "Đ" },
+                { text: "c. Việc phát hiện răng của Người tối cổ tại Thẩm Khuyên, Thẩm Hai (Lạng Sơn) và công cụ đá ở Núi Đọ (Thanh Hoá) cho thấy Việt Nam không nằm trong dòng chảy tiến hoá chung của loài người trên thế giới[cite: 1].", correct: "S" },
+                { text: "d. Sự phân bố của các di chỉ đồ đá cũ tại Đông Nam Á chứng tỏ khu vực này là một trong những địa bàn cư trú và tiến hoá sớm của loài người[cite: 1].", correct: "Đ" }
+            ]
+        },
+        {
+            title: "Câu 21. Từ kiến thức Bài 6 \"Sự chuyển biến và phân hóa của xã hội nguyên thủy\"[cite: 1]:",
+            items: [
+                { text: "a. Khi con người phát hiện và biết sử dụng kim loại chế tạo công cụ, năng suất lao động tăng lên, tạo chuyển biến quan trọng trong đời sống xã hội nguyên thủy[cite: 1].", correct: "Đ" },
+                { text: "b. Sự xuất hiện của sản phẩm dư thừa và tư hữu tài sản là nguyên nhân dẫn đến phân hóa giàu nghèo, hình thành xã hội có giai cấp[cite: 1].", correct: "Đ" },
+                { text: "c. Nếu công cụ lao động bằng kim loại không xuất hiện, năng suất lao động vẫn có thể tăng nhanh như khi sử dụng công cụ kim loại[cite: 1].", correct: "S" },
+                { text: "d. Kim loại giúp tạo nhiều sản phẩm hơn, nhưng cũng làm xuất hiện phân hóa giàu nghèo và thúc đẩy xã hội nguyên thủy tan rã[cite: 1].", correct: "Đ" }
+            ]
+        },
+        {
+            title: "Câu 22 (Bổ sung). Về văn hóa khảo cổ và sự phân hóa xã hội:",
+            items: [
+                { text: "a. Phùng Nguyên, Đồng Đậu và Gò Mun là những nền văn hóa khảo cổ tiêu biểu của cư dân thời nguyên thủy ở Việt Nam[cite: 1].", correct: "Đ" },
+                { text: "b. Ở phương Đông, xã hội nguyên thủy phân hóa không triệt để vì cư dân vẫn sống gắn bó trong các cộng đồng nông nghiệp[cite: 1].", correct: "Đ" },
+                { text: "c. Sự xuất hiện của công cụ kim loại chỉ mang lại lợi ích cho sản xuất, không góp phần làm thay đổi tổ chức xã hội[cite: 1].", correct: "S" },
+                { text: "d. Khi một số người có nhiều của cải hơn và chiếm hữu tài sản riêng, xã hội xuất hiện người giàu, người nghèo[cite: 1].", correct: "Đ" }
+            ]
+        }
+    ],
+    ls_essay: [
+        { q: "Câu 1: Lao động có vai trò như thế nào đối với quá trình phát triển của người nguyên thủy cũng như của con người và xã hội loài người?", keywords: ["thức ăn", "săn bắt", "trồng trọt", "thể chất", "trí tuệ", "công cụ", "hợp tác", "cộng đồng"], g: "- Giúp tạo ra thức ăn (săn bắt, hái lượm, trồng trọt, chăn nuôi)[cite: 1].\n- Góp phần phát triển thể chất và trí tuệ[cite: 1].\n- Giúp chế tạo công cụ lao động[cite: 1].\n- Thúc đẩy xã hội hợp tác, hình thành cộng đồng[cite: 1]." },
+        { q: "Câu 2: Em hãy mô tả sơ lược các giai đoạn tiến triển của xã hội người nguyên thuỷ.", keywords: ["bầy người", "người tối cổ", "công xã", "thị tộc", "người tinh khôn", "huyết thống", "bình đẳng", "chung"], g: "- Giai đoạn 1: Bầy người nguyên thủy (gắn với Người tối cổ)[cite: 1].\n- Giai đoạn 2: Công xã thị tộc (gắn với Người tinh khôn, sống theo huyết thống, bình đẳng, cùng làm chung hưởng chung)[cite: 1]." },
+        { q: "Câu 3: Tính các năm 208 TCN, năm 938, năm 40 cách năm hiện tại (2026) bao nhiêu năm? Các năm đó thuộc thế kỉ mấy?", keywords: ["2234", "iii", "1088", "x", "1986", "i"], g: "- Năm 208 TCN: 2234 năm, Thế kỉ III TCN[cite: 1]\n- Năm 938: 1088 năm, Thế kỉ X[cite: 1]\n- Năm 40: 1986 năm, Thế kỉ I[cite: 1]" }
+    ]
+};
+
+function shuffle(array) {
+    let currentIndex = array.length, randomIndex;
+    let newArray = [...array];
+    while (currentIndex != 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [newArray[currentIndex], newArray[randomIndex]] = [newArray[randomIndex], newArray[currentIndex]];
+    }
+    return newArray;
+}
+
+let timerInterval;
+let secondsPassed = 0;
+let processedMCQ = [];
+
+function startQuiz() {
+    const name = document.getElementById('studentName').value.trim();
+    if (!name) { alert('Vui lòng nhập họ và tên của bạn!'); return; }
+
+    document.getElementById('displayName').innerText = name;
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('quizScreen').classList.remove('hidden');
+
+    secondsPassed = 0;
+    timerInterval = setInterval(() => {
+        secondsPassed++;
+        let m = Math.floor(secondsPassed / 60).toString().padStart(2, '0');
+        let s = (secondsPassed % 60).toString().padStart(2, '0');
+        document.getElementById('timer').innerText = `${m}:${s}`;
+    }, 1000);
+
+    renderQuestions();
+}
+
+function renderQuestions() {
+    const container = document.getElementById('questionsContainer');
+    container.innerHTML = '';
+    processedMCQ = [];
+
+    let html = `<div class="section-header">PHẦN I: TRẮC NGHIỆM NHIỀU LỰA CHỌN[cite: 1]</div>`;
+    rawData.ls_mcq.forEach((item, idx) => {
+        let options = shuffle([...item.a.map(x => ({ t: x, c: true })), ...item.w.map(x => ({ t: x, c: false }))]);
+        let qId = `ls_mcq_${idx}`;
+        processedMCQ.push({ id: qId, q: item.q, options: options });
+        html += `
+            <div class="question-card">
+                <p><strong>Câu ${idx + 1}:</strong> ${item.q}</p>
+                <div class="options">
+                    ${options.map((opt, oIdx) => `
+                        <label><input type="radio" name="${qId}" value="${oIdx}"> ${String.fromCharCode(65 + oIdx)}.${opt.t}</label>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    });
+
+    html += `<div class="section-header">PHẦN II: TRẮC NGHIỆM ĐÚNG - SAI[cite: 1]</div>`;
+    rawData.ls_tf.forEach((group, gIdx) => {
+        html += `
+            <div class="question-card">
+                <p><strong>${group.title}</strong></p>
+                <table class="true-false-table">
+                    <tr><th>Nhận định</th><th width="80">Chọn</th></tr>
+                    ${group.items.map((it, iIdx) => `
+                        <tr>
+                            <td>\${it.text}</td>
+                            <td>
+                                <select name="ls_tf_${gIdx}_${iIdx}">
+                                    <option value="">--</option>
+                                    <option value="Đ">Đúng</option>
+                                    <option value="S">Sai</option>
+                                </select>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </table>
+            </div>
+        `;
+    });
+
+    html += `<div class="section-header">PHẦN III: TỰ LUẬN[cite: 1]</div>`;
+    rawData.ls_essay.forEach((item, idx) => {
+        html += `
+            <div class="question-card">
+                <p><strong>${item.q}</strong></p>
+                <textarea name="ls_essay_${idx}" placeholder="Nhập câu trả lời/bài làm tại đây..."></textarea>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+function submitQuiz() {
+    clearInterval(timerInterval);
+    let totalScore = 0, maxScore = 0;
+    let reviewHtml = '';
+    const formData = new FormData(document.getElementById('quizForm'));
+
+    reviewHtml += `<div class="section-header">PHẦN I: TRẮC NGHIỆM NHIỀU LỰA CHỌN[cite: 1]</div>`;
+    processedMCQ.forEach((item, idx) => {
+        maxScore += 1;
+        let selectedIdx = formData.get(item.id);
+        let isCorrect = false, selectedText = "Chưa chọn";
+        let correctText = item.options.find(o => o.c).t;
+
+        if (selectedIdx !== null) {
+            selectedText = item.options[selectedIdx].t;
+            if (item.options[selectedIdx].c) { isCorrect = true; totalScore += 1; }
+        }
+        reviewHtml += `
+            <div class="question-card">
+                <p><strong>Câu ${idx + 1}:</strong> ${item.q}</p>
+                <p>Học sinh chọn: <span class="${isCorrect ? 'badge-correct' : 'badge-wrong'}">${selectedText}</span></p>
+                ${!isCorrect ? `<p>Đáp án đúng: <span class="badge-correct">\${correctText}</span></p>` : ''}
+            </div>
+        `;
+    });
+
+    reviewHtml += `<div class="section-header">PHẦN II: TRẮC NGHIỆM ĐÚNG - SAI[cite: 1]</div>`;
+    rawData.ls_tf.forEach((group, gIdx) => {
+        reviewHtml += `<div class="question-card"><p><strong>${group.title}</strong></p>`;
+        group.items.forEach((it, iIdx) => {
+            maxScore += 1;
+            let userVal = formData.get(`ls_tf_${gIdx}_${iIdx}`) || "--";
+            let isOk = (userVal === it.correct);
+            if(isOk) totalScore += 1;
+            reviewHtml += `<p>- ${it.text}<br>Học sinh chọn: <strong class="${isOk ? 'badge-correct' : 'badge-wrong'}">${userVal}</strong> | Đáp án: <strong class="badge-correct">${it.correct}</strong></p>`;
+        });
+        reviewHtml += `</div>`;
+    });
+
+    reviewHtml += `<div class="section-header">PHẦN III: TỰ LUẬN[cite: 1]</div>`;
+    rawData.ls_essay.forEach((item, idx) => {
+        maxScore += 1;
+        let userAns = formData.get(`ls_essay_${idx}`) || "";
+        let lowerAns = userAns.toLowerCase();
+        let matchedKeywords = item.keywords.filter(kw => lowerAns.includes(kw));
+        let pointEarned = (matchedKeywords.length / item.keywords.length >= 0.4) ? 1 : 0;
+        totalScore += pointEarned;
+
+        reviewHtml += `
+            <div class="question-card">
+                <p><strong>${item.q}</strong></p>
+                <p><strong>Bài làm của học sinh:</strong></p>
+                <p style="background: #f8fafc; padding: 10px; border-radius: 4px;">${userAns || "<i>Chưa trả lời</i>"}</p>
+                <p><strong>Đánh giá ý chính:</strong> Khớp ${matchedKeywords.length}/${item.keywords.length} từ khóa &rarr; <span class="${pointEarned > 0 ? 'badge-correct' : 'badge-wrong'}">${pointEarned > 0 ? 'ĐẠT (1/1 điểm)' : 'CHƯA ĐẠT (0/1 điểm)'}</span></p>
+                <p><strong>Gợi ý đáp án chuẩn:</strong><br><span style="color: var(--correct); white-space: pre-wrap;">${item.g}</span></p>
+            </div>
+        `;
+    });
+
+    let studentName = document.getElementById('studentName').value;
+    let m = Math.floor(secondsPassed / 60), s = secondsPassed % 60;
+    let timeStr = `${m} phút ${s} giây`;
+    let currentDate = new Date().toLocaleString('vi-VN');
+
+    let historyData = JSON.parse(localStorage.getItem('quiz_history')) || [];
+    historyData.unshift({
+        date: currentDate,
+        name: studentName,
+        subject: "Phần Lịch sử 6",
+        score: totalScore,
+        maxScore: maxScore,
+        timeSpent: timeStr
+    });
+    localStorage.setItem('quiz_history', JSON.stringify(historyData));
+
+    document.getElementById('quizScreen').classList.add('hidden');
+    document.getElementById('resultScreen').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    document.getElementById('resultStudentName').innerText = `Học sinh: ${studentName}`;
+    document.getElementById('resultTime').innerText = `Thời gian hoàn thành: ${timeStr}`;
+    document.getElementById('totalScore').innerText = totalScore;
+    document.getElementById('maxScore').innerText = maxScore;
+    document.getElementById('reviewContainer').innerHTML = reviewHtml;
+}
+</script>
+</body>
+</html>

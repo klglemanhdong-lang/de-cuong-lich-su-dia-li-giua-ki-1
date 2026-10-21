@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn Tập Giữa Kì I - Lịch Sử và Địa Lí 6</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            margin: 0;
+            padding: 30px 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 { color: #1e3a8a; margin-bottom: 5px; font-size: 24px; }
+        p { color: #64748b; margin-bottom: 25px; font-size: 16px; }
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .btn {
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn:hover { background-color: #0284c7; }
+        .btn-geo { background-color: #0d9488; }
+        .btn-geo:hover { background-color: #0f766e; }
+
+        .history-section {
+            text-align: left;
+            margin-top: 30px;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 20px;
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .history-table th, .history-table td {
+            border: 1px solid #cbd5e1;
+            padding: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .history-table th {
+            background-color: #f1f5f9;
+            color: #1e3a8a;
+        }
+        .clear-btn {
+            background-color: #dc2626;
+            margin-top: 15px;
+            padding: 8px 16px;
+            font-size: 14px;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .clear-btn:hover { background-color: #b91c1c; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ÔN TẬP MÔN LỊCH SỬ VÀ ĐỊA LÍ 6</h1>
+        <p>Kiểm tra Giữa kì I - Năm học 2026 - 2027</p>
+        
+        <div class="btn-group">
+            <a href="lich_su.html" class="btn">📚 Ôn tập Phần Lịch sử</a>
+            <a href="dia_li.html" class="btn btn-geo">🌍 Ôn tập Phần Địa lí</a>
+        </div>
+
+        <div class="history-section">
+            <h3>📋 Lịch sử các bài làm đã nộp trên máy này</h3>
+            <div id="historyContainer">
+                <p style="text-align: center; color: #64748b;">Chưa có dữ liệu bài làm nào.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadHistory() {
+            let historyData = JSON.parse(localStorage.getItem('quiz_history')) || [];
+            let container = document.getElementById('historyContainer');
+
+            if (historyData.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #64748b;">Chưa có dữ liệu bài làm nào.</p>';
+                return;
+            }
+
+            let html = `
+                <table class="history-table">
+                    <tr>
+                        <th>Thời gian nộp</th>
+                        <th>Học sinh</th>
+                        <th>Phần</th>
+                        <th>Điểm số</th>
+                        <th>Thời gian làm bài</th>
+                    </tr>
+            `;
+
+            historyData.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.date}</td>
+                        <td><strong>${item.name}</strong></td>
+                        <td>${item.subject}</td>
+                        <td><span style="color: #16a34a; font-weight: bold;">${item.score} / ${item.maxScore}</span></td>
+                        <td>${item.timeSpent}</td>
+                    </tr>
+                `;
+            });
+
+            html += `</table>
+                     <div style="text-align: right;">
+                        <button class="clear-btn" onclick="clearHistory()">Xóa lịch sử</button>
+                     </div>`;
+            container.innerHTML = html;
+        }
+
+        function clearHistory() {
+            if (confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử làm bài không?')) {
+                localStorage.removeItem('quiz_history');
+                loadHistory();
+            }
+        }
+
+        loadHistory();
+    </script>
+</body>
+</html>
